@@ -22,8 +22,8 @@
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENG)
 #ifdef _WIN32
-LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
-#pragma code_page(1252)
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
+#pragma code_page(936)
 #endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
@@ -119,15 +119,15 @@ IDR_TRAY MENU DISCARDABLE
 BEGIN
     POPUP "Tray Menu"
     BEGIN
-        MENUITEM "Control &panel",              ID_CONTR0L_PANEL
+        MENUITEM "控制面板(&P)",              ID_CONTR0L_PANEL
         MENUITEM SEPARATOR
-        MENUITEM "&Options...",                 ID_OPTIONS
-        MENUITEM "Add &new client...",          ID_CONNECT
-        MENUITEM "&Disconnect clients",         ID_DISCONNECT
-        MENUITEM "D&isable new clients",        ID_DISABLE_NEW_CLIENTS
+        MENUITEM "选项(&O)...",                 ID_OPTIONS
+        MENUITEM "添加新客户端(&N)...",          ID_CONNECT
+        MENUITEM "断开客户端(&D)",         ID_DISCONNECT
+        MENUITEM "禁止新客户端(&I)",        ID_DISABLE_NEW_CLIENTS
         MENUITEM SEPARATOR
-        MENUITEM "&Close VNC server",           ID_CLOSE
-        MENUITEM "&About...",                   ID_ABOUT
+        MENUITEM "关闭 VNC 服务器(&C)",           ID_CLOSE
+        MENUITEM "关于(&A)...",                   ID_ABOUT
     END
 END
 
@@ -140,30 +140,30 @@ END
 IDD_ABOUT DIALOG DISCARDABLE  0, 0, 300, 92
 STYLE DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | WS_CAPTION | 
     WS_SYSMENU
-CAPTION "About TigerVNC server for Windows"
+CAPTION "关于 TigerVNC 服务器（Windows 版）"
 FONT 8, "MS Sans Serif"
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,245,70,47,15
+    DEFPUSHBUTTON   "确定",IDOK,245,70,47,15
     CONTROL         109,IDC_STATIC,"Static",SS_BITMAP,5,10,33,31
     LTEXT           ">appname<",IDC_DESCRIPTION,45,10,125,15
     LTEXT           ">version<",IDC_VERSION,170,10,72,15
     LTEXT           ">buildtime<",IDC_BUILDTIME,45,25,202,15
     LTEXT           ">copyright<",IDC_COPYRIGHT,45,40,256,15
-    LTEXT           "See https://www.tigervnc.org for more information on VNC.",
+    LTEXT           "访问 https://www.tigervnc.org 了解更多 VNC 信息。",
                     IDC_STATIC,45,55,202,15
 END
 
 IDD_QUERY_CONNECT DIALOG DISCARDABLE  0, 0, 164, 93
 STYLE DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | WS_CAPTION | 
     WS_SYSMENU
-CAPTION "VNC server : Accept connection?"
+CAPTION "VNC 服务器：是否接受连接？"
 FONT 8, "MS Sans Serif"
 BEGIN
-    DEFPUSHBUTTON   "&Reject",IDCANCEL,105,72,52,14
-    PUSHBUTTON      "&Accept",IDOK,7,72,53,14
-    RTEXT           "User:",IDC_STATIC,7,10,28,15,SS_CENTERIMAGE
-    RTEXT           "Host:",IDC_STATIC,7,30,28,15,SS_CENTERIMAGE
-    CTEXT           "Seconds until automatic reject:",IDC_STATIC,7,50,113,15,
+    DEFPUSHBUTTON   "拒绝(&R)",IDCANCEL,105,72,52,14
+    PUSHBUTTON      "接受(&A)",IDOK,7,72,53,14
+    RTEXT           "用户：",IDC_STATIC,7,10,32,15,SS_CENTERIMAGE
+    RTEXT           "主机：",IDC_STATIC,7,30,32,15,SS_CENTERIMAGE
+    CTEXT           "秒后自动拒绝：",IDC_STATIC,7,50,113,15,
                     SS_CENTERIMAGE
     LTEXT           "-",IDC_QUERY_COUNTDOWN,125,50,32,15,SS_CENTERIMAGE
     LTEXT           "-",IDC_QUERY_USER,40,10,117,15,SS_CENTERIMAGE
@@ -173,40 +173,40 @@ END
 IDD_ADD_NEW_CLIENT DIALOG DISCARDABLE  0, 0, 177, 52
 STYLE DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | WS_VISIBLE | 
     WS_CAPTION | WS_SYSMENU
-CAPTION "VNC server : Add new client"
+CAPTION "VNC 服务器：添加新客户端"
 FONT 8, "MS Sans Serif"
 BEGIN
     EDITTEXT        IDC_HOST,80,10,90,15,ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "OK",IDOK,80,31,40,14
-    PUSHBUTTON      "Cancel",IDCANCEL,125,31,45,14
+    DEFPUSHBUTTON   "确定",IDOK,80,31,40,14
+    PUSHBUTTON      "取消",IDCANCEL,125,31,45,14
     CONTROL         109,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE,7,
                     10,33,31
-    RTEXT           "Viewer:",IDC_STATIC,45,10,30,15,SS_CENTERIMAGE
+    RTEXT           "查看器：",IDC_STATIC,45,10,34,15,SS_CENTERIMAGE
 END
 
 IDD_CONTROL_PANEL DIALOG DISCARDABLE  0, 0, 267, 238
 STYLE DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | DS_CONTEXTHELP | 
     WS_VISIBLE | WS_CAPTION | WS_SYSMENU
-CAPTION "Control panel"
+CAPTION "控制面板"
 FONT 8, "MS Sans Serif"
 BEGIN
     CONTROL         "List1",IDC_LIST_CONNECTIONS,"SysListView32",LVS_REPORT | 
                     LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOSORTHEADER | 
                     WS_BORDER | WS_TABSTOP,7,25,253,76
-    LTEXT           "Authorised clients list",IDC_STATIC_KLIENTS_LIST,87,7,
+    LTEXT           "已授权客户端列表",IDC_STATIC_KLIENTS_LIST,87,7,
                     74,11,SS_CENTERIMAGE
-    GROUPBOX        "Control of selected clients",
+    GROUPBOX        "对所选客户端的操作",
                     IDC_STATIC_SELECTED_KLIENTS,7,108,124,103
-    PUSHBUTTON      "View-only",IDC_VIEW_ONLY,13,121,111,14
-    PUSHBUTTON      "Full control ",IDC_FULL_CONTROL,13,145,112,14
-    PUSHBUTTON      "Stop updating",IDC_STOP_UPDATE,13,167,111,14
-    PUSHBUTTON      "Kill clients",IDC_KILL_SEL_CLIENT,13,190,111,14
-    PUSHBUTTON      "Properties",IDC_PROPERTIES,144,121,111,14
-    PUSHBUTTON      "Add new client",IDC_ADD_CLIENT,144,145,111,14
-    PUSHBUTTON      "Kill all clients",IDC_KILL_ALL,144,167,111,14
-    CONTROL         "Disable new clients",IDC_DISABLE_CLIENTS,"Button",
+    PUSHBUTTON      "仅查看",IDC_VIEW_ONLY,13,121,111,14
+    PUSHBUTTON      "完全控制",IDC_FULL_CONTROL,13,145,112,14
+    PUSHBUTTON      "停止更新",IDC_STOP_UPDATE,13,167,111,14
+    PUSHBUTTON      "断开所选客户端",IDC_KILL_SEL_CLIENT,13,190,111,14
+    PUSHBUTTON      "属性",IDC_PROPERTIES,144,121,111,14
+    PUSHBUTTON      "添加新客户端",IDC_ADD_CLIENT,144,145,111,14
+    PUSHBUTTON      "断开全部客户端",IDC_KILL_ALL,144,167,111,14
+    CONTROL         "禁止新客户端",IDC_DISABLE_CLIENTS,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,144,191,111,13
-    PUSHBUTTON      "Close",IDCANCEL,144,217,111,14
+    PUSHBUTTON      "关闭",IDCANCEL,144,217,111,14
 END
 
 

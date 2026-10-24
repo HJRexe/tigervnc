@@ -96,7 +96,18 @@ void Dialog::setItemInt(int id, int value) {
   SetDlgItemInt(handle, id, value, TRUE);
 }
 void Dialog::setItemString(int id, const char* s) {
-  SetDlgItemText(handle, id, s);
+  // The narrow string is UTF-8; convert it to a wide string for the W control
+  // API.  On failure the control receives an empty wide string; this must not
+  // throw.  ASCII callers are unaffected by the conversion.
+  std::wstring ws;
+  if (s != nullptr) {
+    int wlen = MultiByteToWideChar(CP_UTF8, 0, s, -1, nullptr, 0);
+    if (wlen > 0) {
+      ws.resize(wlen);
+      MultiByteToWideChar(CP_UTF8, 0, s, -1, &ws[0], wlen);
+    }
+  }
+  SetDlgItemTextW(handle, id, ws.c_str());
 }
 
 

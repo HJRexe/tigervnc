@@ -22,8 +22,8 @@ bool ControlPanel::showDialog()
 void ControlPanel::initDialog()
 {
   const char *ColumnsStrings[] = {
-    "IP address",
-    "Status"
+    "IP 地址",
+    "状态"
   };
   InitLVColumns(IDC_LIST_CONNECTIONS, handle, 120, 2, (char **)ColumnsStrings,
                 LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM,

@@ -52,7 +52,22 @@ namespace rfb {
         title += " : ";
         title += msgType;
       }
-      return MessageBox(parent, msg, title.c_str(), flags);
+      // The narrow message and title are UTF-8; convert them to wide strings
+      // and call MessageBoxW.  ASCII input converts identically to the old
+      // ANSI path, so existing ASCII callers are unaffected.
+      std::wstring wmsg, wtitle;
+      const char* msgPtr = msg ? msg : "";
+      int mlen = MultiByteToWideChar(CP_UTF8, 0, msgPtr, -1, nullptr, 0);
+      if (mlen > 0) {
+        wmsg.resize(mlen);
+        MultiByteToWideChar(CP_UTF8, 0, msgPtr, -1, &wmsg[0], mlen);
+      }
+      int tlen = MultiByteToWideChar(CP_UTF8, 0, title.c_str(), -1, nullptr, 0);
+      if (tlen > 0) {
+        wtitle.resize(tlen);
+        MultiByteToWideChar(CP_UTF8, 0, title.c_str(), -1, &wtitle[0], tlen);
+      }
+      return MessageBoxW(parent, wmsg.c_str(), wtitle.c_str(), flags);
     }
 
   };

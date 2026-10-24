@@ -60,16 +60,16 @@ namespace winvnc {
       buf[0] = Ii->c_str();
       switch (*si) {
       case 0:
-        buf[1] = "Full control";
+        buf[1] = "完全控制";
         break;
       case 1:
-        buf[1] = "View only";
+        buf[1] = "仅查看";
         break;
       case 2:
-        buf[1] = "Stop updating";
+        buf[1] = "停止更新";
         break;
       default:
-        buf[1] = "Unknown";
+        buf[1] = "未知";
       }
     }
 

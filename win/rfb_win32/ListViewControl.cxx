@@ -30,46 +30,55 @@ void ListViewControl::SelectLVItem(DWORD idListView, HWND hDlg, int numberItem)
 }
 
 BOOL ListViewControl::InitLVColumns(DWORD idListView, HWND hDlg, int width, int columns,
-                                    char *title[], DWORD mask, DWORD LVStyle, DWORD format)
+                                    char * title[], DWORD mask, DWORD LVStyle, DWORD format)
 {
-  (void)ListView_SetExtendedListViewStyle(GetDlgItem(hDlg, idListView), LVStyle);
-  char szText[256];      
-  LVCOLUMN lvc; 
+  HWND hList = GetDlgItem(hDlg, idListView);
+  (void)ListView_SetExtendedListViewStyle(hList, LVStyle);
+  WCHAR szText[256];
+  LVCOLUMNW lvc;
   int iCol;
-  
-  lvc.mask = mask; 
-  
-  for (iCol = 0; iCol < columns; iCol++) { 
+
+  lvc.mask = mask;
+
+  for (iCol = 0; iCol < columns; iCol++) {
     lvc.iSubItem = iCol;
-    lvc.pszText = szText;	
-    lvc.cx = width;           
+    lvc.pszText = szText;
+    lvc.cx = width;
     lvc.fmt = format;
-    
-    strcpy(szText, title[iCol]);
-    if (ListView_InsertColumn(GetDlgItem(hDlg, idListView), iCol, &lvc) == -1) 
-      return FALSE; 
-  } 
-  return TRUE; 
+
+    // UTF-8 narrow header -> wide string for ListView_InsertColumnW.
+    MultiByteToWideChar(CP_UTF8, 0, title[iCol], -1, szText, 256);
+    szText[255] = 0;
+    if (ListView_InsertColumnW(hList, iCol, &lvc) == -1)
+      return FALSE;
+  }
+  return TRUE;
 }
 
 BOOL ListViewControl::InsertLVItem(DWORD idListView, HWND hDlg, int number,  char * texts[],
                                    int columns)
 {
   int i;
-  LVITEM lvI;
-  lvI.mask = LVIF_TEXT| LVIF_STATE; 
-  lvI.state = 0; 
-  lvI.stateMask = 0; 
-  lvI.iItem = number; 
-  lvI.iSubItem = 0; 
-  lvI.pszText = texts[0]; 									  
-  
-  if(ListView_InsertItem(GetDlgItem(hDlg, idListView), &lvI) == -1)
+  HWND hList = GetDlgItem(hDlg, idListView);
+  WCHAR wText[256];
+  LVITEMW lvI;
+  lvI.mask = LVIF_TEXT| LVIF_STATE;
+  lvI.state = 0;
+  lvI.stateMask = 0;
+  lvI.iItem = number;
+  lvI.iSubItem = 0;
+
+  // UTF-8 narrow row text -> wide string for ListView_InsertItemW.
+  MultiByteToWideChar(CP_UTF8, 0, texts[0], -1, wText, 256);
+  wText[255] = 0;
+  lvI.pszText = wText;
+
+  if(ListView_InsertItemW(hList, &lvI) == -1)
     return FALSE;
-  
-  for (i =1; i < columns; i++) {	
+
+  for (i =1; i < columns; i++) {
     SetLVItemText(
-      idListView, hDlg, 
+      idListView, hDlg,
       number, i, texts[i]);
   }
   return TRUE;
@@ -78,9 +87,13 @@ BOOL ListViewControl::InsertLVItem(DWORD idListView, HWND hDlg, int number,  cha
 void ListViewControl::SetLVItemText(DWORD idListView, HWND hDlg, int numberItem,
                                     int namberColumn, char * text)
 {
-  ListView_SetItemText(
-    GetDlgItem(hDlg, idListView), 
-    numberItem, namberColumn, text);
+  WCHAR wText[256];
+  // UTF-8 narrow sub-item text -> wide string for ListView_SetItemTextW.
+  MultiByteToWideChar(CP_UTF8, 0, text, -1, wText, 256);
+  wText[255] = 0;
+  ListView_SetItemTextW(
+    GetDlgItem(hDlg, idListView),
+    numberItem, namberColumn, wText);
 }
 
 void ListViewControl::GetLVItemText(DWORD idListView, HWND hDlg, int numberItem,

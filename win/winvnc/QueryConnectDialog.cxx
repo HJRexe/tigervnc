@@ -89,7 +89,7 @@ void QueryConnectDialog::initDialog() {
     throw core::win32_error("SetTimer", GetLastError());
   setItemString(IDC_QUERY_HOST, peerIp.c_str());
   if (userName.empty())
-    userName = "(anonymous)";
+    userName = "（匿名）";
   setItemString(IDC_QUERY_USER, userName.c_str());
   setCountdownLabel();
 }

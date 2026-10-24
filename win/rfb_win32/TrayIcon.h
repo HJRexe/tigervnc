@@ -38,7 +38,7 @@ namespace rfb {
 #ifdef NOTIFYICONDATA_V1_SIZE
         nid.cbSize = NOTIFYICONDATA_V1_SIZE;
 #else
-        nid.cbSize = sizeof(NOTIFYICONDATA);
+        nid.cbSize = sizeof(NOTIFYICONDATAW);
 #endif
 
         nid.hWnd = getHandle();
@@ -63,21 +63,29 @@ namespace rfb {
         if (text == nullptr) {
           nid.uFlags &= ~NIF_TIP;
         } else {
-          const int tipLen = sizeof(nid.szTip)/sizeof(char);
-          strncpy(nid.szTip, text, tipLen);
+          // The narrow text is UTF-8; convert it to a wide string for the
+          // WCHAR tooltip buffer, truncating in the same way as the old
+          // strncpy-based code.
+          const int tipLen = sizeof(nid.szTip)/sizeof(WCHAR);
+          int wlen = MultiByteToWideChar(CP_UTF8, 0, text, -1, nullptr, 0);
+          if (wlen > tipLen) wlen = tipLen;
+          if (wlen > 0)
+            MultiByteToWideChar(CP_UTF8, 0, text, -1, nid.szTip, tipLen);
+          else
+            nid.szTip[0] = 0;
           nid.szTip[tipLen-1] = 0;
           nid.uFlags |= NIF_TIP;
         }
         return refresh();
       }
       bool remove() {
-        return Shell_NotifyIcon(NIM_DELETE, &nid) != 0;
+        return Shell_NotifyIconW(NIM_DELETE, &nid) != 0;
       }
       bool refresh() {
-        return Shell_NotifyIcon(NIM_MODIFY, &nid) || Shell_NotifyIcon(NIM_ADD, &nid);
+        return Shell_NotifyIconW(NIM_MODIFY, &nid) || Shell_NotifyIconW(NIM_ADD, &nid);
       }
     protected:
-      NOTIFYICONDATA nid;
+      NOTIFYICONDATAW nid;
     };
 
   };

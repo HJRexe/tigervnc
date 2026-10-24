@@ -152,7 +152,7 @@ public:
         thread.server.disconnectClients("tray menu disconnect");
         break;
       case ID_CLOSE:
-        if (MsgBox(nullptr, "Are you sure you want to close the server?",
+        if (MsgBox(nullptr, "确定要关闭 VNC 服务器吗？",
                    MB_ICONQUESTION | MB_YESNO | MB_DEFBUTTON2) == IDYES) {
           if (isServiceProcess()) {
             try {
