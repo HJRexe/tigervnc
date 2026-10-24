@@ -211,10 +211,10 @@ PropSheet::PropSheet(HINSTANCE inst_, const char* title_, std::list<PropSheetPag
 : icon(icon_), pages(pages_), inst(inst_), title(title_), handle(nullptr), alreadyShowing(0) {
   // Convert the UTF-8 narrow title to a wide string for PropertySheetW.
   // On failure wtitle stays empty; this must not throw.
-  int wlen = MultiByteToWideChar(CP_UTF8, 0, title_.c_str(), -1, nullptr, 0);
+  int wlen = MultiByteToWideChar(CP_UTF8, 0, title_, -1, nullptr, 0);
   if (wlen > 0) {
     wtitle.resize(wlen);
-    MultiByteToWideChar(CP_UTF8, 0, title_.c_str(), -1, &wtitle[0], wlen);
+    MultiByteToWideChar(CP_UTF8, 0, title_, -1, &wtitle[0], wlen);
   }
 }
 
