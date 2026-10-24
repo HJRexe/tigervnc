@@ -56,10 +56,38 @@ jobs:
             mkdir -p "pkg/locale/$lang/LC_MESSAGES"
             cp "$mo" "pkg/locale/$lang/LC_MESSAGES/tigervnc.mo"
           done
+
+          # Collect non-system runtime DLLs that ldd resolves from the MSYS2
+          # UCRT64 toolchain; system and UCRT DLLs resolve under /c/WINDOWS and
+          # are intentionally excluded.
+          ldd_list=$(mktemp)
+          for pe in vncviewer/vncviewer.exe win/vncconfig/vncconfig.exe \
+                    win/winvnc/winvnc4.exe win/wm_hooks/wm_hooks.dll; do
+            ldd "$pe"
+          done | grep -E '/(ucrt64|mingw64|msys64)/bin/' \
+              | sed -E 's/^[[:space:]]*[^=]+=>[[:space:]]+([^[:space:]]+).*/\1/' \
+              | sort -u > "$ldd_list"
+          echo "==== ldd-resolved MSYS2 DLLs ===="
+          cat "$ldd_list"
+          while read -r dll_path; do
+            cp "$dll_path" pkg/
+          done < "$ldd_list"
+          rm -f "$ldd_list"
+
           missing=0
-          for f in pkg/vncviewer.exe pkg/vncconfig.exe pkg/winvnc4.exe pkg/wm_hooks.dll pkg/README.rst pkg/LICENCE.TXT; do
+          for f in pkg/vncviewer.exe pkg/vncconfig.exe pkg/winvnc4.exe \
+                   pkg/wm_hooks.dll pkg/README.rst pkg/LICENCE.TXT; do
             if [ ! -f "$f" ]; then
               echo "MISSING: $f"
+              missing=1
+            fi
+          done
+          required_dlls="libgcc_s_seh-1.dll libwinpthread-1.dll libstdc++-6.dll \
+            libgmp-10.dll libgnutls-30.dll libhogweed-7.dll libjpeg-8.dll \
+            libnettle-9.dll libpixman-1-0.dll zlib1.dll libfltk.dll libintl-8.dll"
+          for f in $required_dlls; do
+            if [ ! -f "pkg/$f" ]; then
+              echo "MISSING: pkg/$f"
               missing=1
             fi
           done
