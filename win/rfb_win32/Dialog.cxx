@@ -209,6 +209,13 @@ BOOL PropSheetPage::dialogProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 
 PropSheet::PropSheet(HINSTANCE inst_, const char* title_, std::list<PropSheetPage*> pages_, HICON icon_)
 : icon(icon_), pages(pages_), inst(inst_), title(title_), handle(nullptr), alreadyShowing(0) {
+  // Convert the UTF-8 narrow title to a wide string for PropertySheetW.
+  // On failure wtitle stays empty; this must not throw.
+  int wlen = MultiByteToWideChar(CP_UTF8, 0, title_.c_str(), -1, nullptr, 0);
+  if (wlen > 0) {
+    wtitle.resize(wlen);
+    MultiByteToWideChar(CP_UTF8, 0, title_.c_str(), -1, &wtitle[0], wlen);
+  }
 }
 
 PropSheet::~PropSheet() {
@@ -259,13 +266,13 @@ bool PropSheet::showPropSheet(HWND owner_, bool showApply, bool showCtxtHelp, bo
     }
  
     // Initialise and create the PropertySheet itself
-    PROPSHEETHEADER header;
-    header.dwSize = sizeof(PROPSHEETHEADER); // Requires comctl32.dll 4.71 or greater, ie IE 4 or later
+    PROPSHEETHEADERW header;
+    header.dwSize = sizeof(PROPSHEETHEADERW); // Requires comctl32.dll 4.71 or greater, ie IE 4 or later
     header.dwFlags = PSH_MODELESS | (showApply ? 0 : PSH_NOAPPLYNOW) | (showCtxtHelp ? 0 : PSH_USECALLBACK);
     header.pfnCallback = removeCtxtHelp;
     header.hwndParent = owner_;
     header.hInstance = inst;
-    header.pszCaption = title.c_str();
+    header.pszCaption = wtitle.c_str();
     header.nPages = count;
     header.nStartPage = 0;
     header.phpage = hpages;
@@ -274,7 +281,7 @@ bool PropSheet::showPropSheet(HWND owner_, bool showApply, bool showCtxtHelp, bo
       header.dwFlags |= PSH_USEHICON;
     }
 
-    handle = (HWND)PropertySheet(&header);
+    handle = (HWND)PropertySheetW(&header);
     if ((handle == nullptr) || (handle == (HWND)-1))
       throw core::win32_error("PropertySheet failed", GetLastError());
     centerWindow(handle, owner_);

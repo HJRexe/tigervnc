@@ -132,6 +132,7 @@ namespace rfb {
       std::list<PropSheetPage*> pages;
       HINSTANCE inst;
       std::string title;
+      std::wstring wtitle;
       HWND handle;
       bool alreadyShowing;
     };

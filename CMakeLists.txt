@@ -122,6 +122,12 @@ endif()
 # Minimum version is Windows 7
 if(WIN32)
   add_definitions(-D_WIN32_WINNT=0x0601)
+  # Keep narrow string literals as UTF-8 so runtime MultiByteToWideChar(CP_UTF8)
+  # decodes Chinese UI text correctly; the vncconfig resources are read as GBK
+  # by windres and converted to Unicode dialog templates.
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -finput-charset=UTF-8 -fexec-charset=UTF-8")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -finput-charset=UTF-8 -fexec-charset=UTF-8")
+  set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS} -c 936")
 endif()
 
 # Legacy macros (macOS 10.12 and older) conflict with our code

@@ -22,8 +22,8 @@
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENG)
 #ifdef _WIN32
-LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
-#pragma code_page(1252)
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
+#pragma code_page(936)
 #endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
@@ -68,152 +68,152 @@ IDI_ICON                ICON    DISCARDABLE     "vncconfig.ico"
 
 IDD_SECURITY DIALOG DISCARDABLE  0, 0, 180, 220
 STYLE DS_MODALFRAME | DS_CONTROL | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Security"
+CAPTION "安全"
 FONT 8, "MS Sans Serif"
 BEGIN
-    GROUPBOX		"Session encryption", IDC_STATIC, 7,10,120,60
-    CONTROL		"None", IDC_ENC_NONE, "Button", BS_AUTOCHECKBOX | WS_TABSTOP,
+    GROUPBOX		"会话加密", IDC_STATIC, 7,10,120,60
+    CONTROL		"无", IDC_ENC_NONE, "Button", BS_AUTOCHECKBOX | WS_TABSTOP,
 			10,20,50,15
-    CONTROL		"Anonymous TLS", IDC_ENC_TLS, "Button",
+    CONTROL		"匿名 TLS", IDC_ENC_TLS, "Button",
 			BS_AUTOCHECKBOX | WS_TABSTOP, 10,35,80,15
-    CONTROL		"TLS with X.509 certificates", IDC_ENC_X509, "Button",
+    CONTROL		"带 X.509 证书的 TLS", IDC_ENC_X509, "Button",
 			BS_AUTOCHECKBOX | WS_TABSTOP, 10,50,110,15
-    GROUPBOX		"X.509 certificates", IDC_STATIC, 7,75,185,30
-    PUSHBUTTON		"Load X.509 Certificate", IDC_LOAD_CERT, 10,85,80,15
-    PUSHBUTTON		"Load X.509 Certificate key", IDC_LOAD_CERTKEY, 90,85,100,15
-    GROUPBOX		"Authentication", IDC_STATIC, 7,110,170,60
-    CONTROL		"None", IDC_AUTH_NONE, "Button", BS_AUTOCHECKBOX | WS_TABSTOP,
+    GROUPBOX		"X.509 证书", IDC_STATIC, 7,75,185,30
+    PUSHBUTTON		"加载 X.509 证书", IDC_LOAD_CERT, 10,85,80,15
+    PUSHBUTTON		"加载 X.509 证书密钥", IDC_LOAD_CERTKEY, 90,85,100,15
+    GROUPBOX		"身份验证", IDC_STATIC, 7,110,170,60
+    CONTROL		"无", IDC_AUTH_NONE, "Button", BS_AUTOCHECKBOX | WS_TABSTOP,
 			10,120,50,15
-    CONTROL		"Standard VNC", IDC_AUTH_VNC, "Button",
+    CONTROL		"标准 VNC", IDC_AUTH_VNC, "Button",
 			BS_AUTOCHECKBOX | WS_TABSTOP, 10,135,80,15
-    PUSHBUTTON		"Configure", IDC_AUTH_VNC_PASSWD, 100,135,61,15
+    PUSHBUTTON		"配置", IDC_AUTH_VNC_PASSWD, 100,135,61,15
 /*
     CONTROL		"Plaintext", IDC_AUTH_PLAIN, "Button",
 			BS_AUTOCHECKBOX | WS_TABSTOP, 10,150,70,15
 */
-    CONTROL		"Prompt local user to accept connections",
+    CONTROL		"提示本地用户接受连接",
 			IDC_QUERY_CONNECT, "Button", BS_AUTOCHECKBOX | WS_TABSTOP,
 			7,170,181,15
-    CONTROL		"Only prompt when there is a user logged on",
+    CONTROL		"仅在有用户登录时提示",
 			IDC_QUERY_LOGGED_ON, "Button", BS_AUTOCHECKBOX | 
 			WS_TABSTOP,20,185,166,15
 END
 
 IDD_CONNECTIONS DIALOG DISCARDABLE  0, 0, 218, 198
 STYLE DS_MODALFRAME | DS_CONTROL | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Connections"
+CAPTION "连接"
 FONT 8, "MS Sans Serif"
 BEGIN
-    CONTROL         "Accept connections on port:",IDC_RFB_ENABLE,"Button",
+    CONTROL         "接受连接的端口:",IDC_RFB_ENABLE,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,7,10,138,15
     EDITTEXT        IDC_PORT,150,10,61,15,ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           "Disconnect idle clients after (seconds):",IDC_STATIC,7,
+    LTEXT           "空闲秒数后断开客户端:",IDC_STATIC,7,
                     25,138,15,SS_CENTERIMAGE
     EDITTEXT        IDC_IDLE_TIMEOUT,150,25,61,15,ES_AUTOHSCROLL | ES_NUMBER
-    GROUPBOX        "Access control",IDC_STATIC,7,55,204,135
-    CONTROL         "Only accept connections from the local machine",
+    GROUPBOX        "访问控制",IDC_STATIC,7,55,204,135
+    CONTROL         "仅接受来自本机的连接",
                     IDC_LOCALHOST,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,
                     70,190,15
     LISTBOX         IDC_HOSTS,15,90,130,95,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | 
                     WS_TABSTOP
-    PUSHBUTTON      "&Add",IDC_HOST_ADD,150,90,55,15
-    PUSHBUTTON      "&Remove",IDC_HOST_REMOVE,150,110,55,15
-    PUSHBUTTON      "Move Up",IDC_HOST_UP,150,130,55,15
-    PUSHBUTTON      "Move Down",IDC_HOST_DOWN,150,150,55,15
-    PUSHBUTTON      "&Edit",IDC_HOST_EDIT,150,170,55,15
+    PUSHBUTTON      "添加",IDC_HOST_ADD,150,90,55,15
+    PUSHBUTTON      "删除",IDC_HOST_REMOVE,150,110,55,15
+    PUSHBUTTON      "上移",IDC_HOST_UP,150,130,55,15
+    PUSHBUTTON      "下移",IDC_HOST_DOWN,150,150,55,15
+    PUSHBUTTON      "编辑",IDC_HOST_EDIT,150,170,55,15
 END
 
 IDD_HOOKING DIALOG DISCARDABLE  0, 0, 197, 101
 STYLE DS_MODALFRAME | DS_CONTROL | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Capture method"
+CAPTION "捕获方式"
 FONT 8, "MS Sans Serif"
 BEGIN
-    CONTROL         "Poll for changes to the desktop",IDC_USEPOLLING,"Button",
+    CONTROL         "轮询桌面变化",IDC_USEPOLLING,"Button",
                     BS_AUTORADIOBUTTON | WS_GROUP,7,10,183,15
-    CONTROL         "Use VNC hooks to track changes",IDC_USEHOOKS,"Button",
+    CONTROL         "用 VNC 钩子跟踪变化",IDC_USEHOOKS,"Button",
                     BS_AUTORADIOBUTTON,7,25,183,15
-    CONTROL         "Poll console windows for updates",IDC_POLLCONSOLES,
+    CONTROL         "轮询控制台窗口更新",IDC_POLLCONSOLES,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,40,165,15
-    CONTROL         "Capture alpha-blended windows",IDC_CAPTUREBLT,"Button",
+    CONTROL         "捕获半透明混合窗口",IDC_CAPTUREBLT,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,7,55,183,15
 END
 
 IDD_AUTH_VNC_PASSWD DIALOG DISCARDABLE  0, 0, 212, 70
 STYLE DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | WS_CAPTION | 
     WS_SYSMENU
-CAPTION "VNC server password"
+CAPTION "VNC 服务器密码"
 FONT 8, "MS Sans Serif"
 BEGIN
-    LTEXT           "New password:",IDC_STATIC,7,10,63,15
+    LTEXT           "新密码:",IDC_STATIC,7,10,63,15
     EDITTEXT        IDC_PASSWORD1,75,10,130,15,ES_PASSWORD | ES_AUTOHSCROLL
-    LTEXT           "Confirm password:",IDC_STATIC,7,30,63,14
+    LTEXT           "确认密码:",IDC_STATIC,7,30,63,14
     EDITTEXT        IDC_PASSWORD2,75,30,130,14,ES_PASSWORD | ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "OK",IDOK,100,50,50,15
-    PUSHBUTTON      "Cancel",IDCANCEL,155,50,50,15
+    DEFPUSHBUTTON   "确定",IDOK,100,50,50,15
+    PUSHBUTTON      "取消",IDCANCEL,155,50,50,15
 END
 
 IDD_LEGACY DIALOG DISCARDABLE  0, 0, 166, 92
 STYLE DS_MODALFRAME | DS_CONTROL | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Legacy"
+CAPTION "兼容旧版"
 FONT 8, "MS Sans Serif"
 BEGIN
-    PUSHBUTTON      "&Import VNC 3.3 settings",IDC_LEGACY_IMPORT,7,10,92,20
-    CONTROL         "Only use protocol version 3.3",IDC_PROTOCOL_3_3,"Button",
+    PUSHBUTTON      "导入 VNC 3.3 设置",IDC_LEGACY_IMPORT,7,10,92,20
+    CONTROL         "仅使用协议版本 3.3",IDC_PROTOCOL_3_3,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,7,35,152,15
 END
 
 IDD_CONN_HOST DIALOG DISCARDABLE  0, 0, 225, 57
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION
-CAPTION "Specify host IP address pattern"
+CAPTION "指定主机 IP 地址规则"
 FONT 8, "MS Sans Serif"
 BEGIN
     EDITTEXT        IDC_HOST_PATTERN,65,5,100,15,ES_AUTOHSCROLL
-    CONTROL         "&Allow",IDC_ALLOW,"Button",BS_AUTORADIOBUTTON | 
+    CONTROL         "允许",IDC_ALLOW,"Button",BS_AUTORADIOBUTTON | 
                     WS_GROUP,7,5,53,15
-    CONTROL         "&Deny",IDC_DENY,"Button",BS_AUTORADIOBUTTON,7,20,53,15
-    CONTROL         "Query",IDC_QUERY,"Button",BS_AUTORADIOBUTTON,7,35,53,15
-    DEFPUSHBUTTON   "OK",IDOK,115,35,50,15
-    PUSHBUTTON      "Cancel",IDCANCEL,170,35,50,15
+    CONTROL         "拒绝",IDC_DENY,"Button",BS_AUTORADIOBUTTON,7,20,53,15
+    CONTROL         "询问",IDC_QUERY,"Button",BS_AUTORADIOBUTTON,7,35,53,15
+    DEFPUSHBUTTON   "确定",IDOK,115,35,50,15
+    PUSHBUTTON      "取消",IDCANCEL,170,35,50,15
     LTEXT           "e.g. 192.168.0.0/16",IDC_STATIC,65,20,100,15
 END
 
 IDD_SHARING DIALOG DISCARDABLE  0, 0, 186, 95
 STYLE DS_MODALFRAME | DS_CONTROL | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Sharing"
+CAPTION "共享"
 FONT 8, "MS Sans Serif"
 BEGIN
-    CONTROL         "Always treat new connections as shared",
+    CONTROL         "始终将新连接视为共享",
                     IDC_SHARE_ALWAYS,"Button",BS_AUTORADIOBUTTON | WS_GROUP,
                     7,10,172,15
-    CONTROL         "Never treat new connections as shared",IDC_SHARE_NEVER,
+    CONTROL         "从不将新连接视为共享",IDC_SHARE_NEVER,
                     "Button",BS_AUTORADIOBUTTON,7,25,172,15
-    CONTROL         "Use client's preferred sharing setting",
+    CONTROL         "使用客户端首选共享设置",
                     IDC_SHARE_CLIENT,"Button",BS_AUTORADIOBUTTON,7,40,172,15
-    CONTROL         "Non-shared connections replace existing ones",
+    CONTROL         "非共享连接替换已有连接",
                     IDC_DISCONNECT_CLIENTS,"Button",BS_AUTOCHECKBOX | 
                     WS_TABSTOP,7,55,172,15
 END
 
 IDD_INPUTS DIALOG DISCARDABLE  0, 0, 186, 119
 STYLE DS_MODALFRAME | DS_CONTROL | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Inputs"
+CAPTION "输入"
 FONT 8, "MS Sans Serif"
 BEGIN
-    CONTROL         "Accept pointer events from clients",IDC_ACCEPT_PTR,
+    CONTROL         "接受客户端指针事件",IDC_ACCEPT_PTR,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,10,172,15
-    CONTROL         "Accept keyboard events from clients",IDC_ACCEPT_KEYS,
+    CONTROL         "接受客户端键盘事件",IDC_ACCEPT_KEYS,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,25,172,15
-    CONTROL         "Send raw keyboard events to applications",IDC_RAW_KEYBOARD,
+    CONTROL         "向应用发送原始键盘事件",IDC_RAW_KEYBOARD,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,40,172,15
-    CONTROL         "Accept clipboard updates from clients",
+    CONTROL         "接受客户端剪贴板更新",
                     IDC_ACCEPT_CUTTEXT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
                     7,55,172,15
-    CONTROL         "Send clipboard updates to clients",IDC_SEND_CUTTEXT,
+    CONTROL         "发送剪贴板更新给客户端",IDC_SEND_CUTTEXT,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,70,172,15
-    CONTROL         "Allow input events to affect the screen-saver",
+    CONTROL         "允许输入事件影响屏保",
                     IDC_AFFECT_SCREENSAVER,"Button",BS_AUTOCHECKBOX | 
                     WS_TABSTOP,7,85,172,15
-    CONTROL         "Disable local inputs while server is in use",
+    CONTROL         "服务运行时禁用本地输入",
                     IDC_DISABLE_LOCAL_INPUTS,"Button",BS_AUTOCHECKBOX | 
                     WS_TABSTOP,7,110,172,15
 END
@@ -221,36 +221,36 @@ END
 IDD_ABOUT DIALOG DISCARDABLE  0, 0, 300, 92
 STYLE DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | WS_CAPTION | 
     WS_SYSMENU
-CAPTION "About TigerVNC config for Windows"
+CAPTION "关于 TigerVNC 配置"
 FONT 8, "MS Sans Serif"
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,245,70,47,15
+    DEFPUSHBUTTON   "确定",IDOK,245,70,47,15
     ICON            IDI_ICON,IDC_STATIC,7,7,20,20
     LTEXT           ">appname<",IDC_DESCRIPTION,40,7,125,18
     LTEXT           ">version<",IDC_VERSION,165,7,77,18
     LTEXT           ">buildtime<",IDC_BUILDTIME,40,25,202,15
     LTEXT           ">copyright<",IDC_COPYRIGHT,40,40,256,15
-    LTEXT           "See https://www.tigervnc.org for more information on TigerVNC.",
+    LTEXT           "访问 https://www.tigervnc.org 了解 TigerVNC 详情。",
                     IDC_STATIC,40,55,202,15
 END
 
 IDD_DESKTOP DIALOG DISCARDABLE  0, 0, 185, 137
 STYLE DS_MODALFRAME | DS_SETFOREGROUND | DS_CONTROL | WS_POPUP | WS_CAPTION | 
     WS_SYSMENU
-CAPTION "Desktop"
+CAPTION "桌面"
 FONT 8, "MS Sans Serif"
 BEGIN
-    GROUPBOX        "While connected",IDC_STATIC,7,5,171,45
-    CONTROL         "Remove wallpaper",IDC_REMOVE_WALLPAPER,"Button",
+    GROUPBOX        "连接期间",IDC_STATIC,7,5,171,45
+    CONTROL         "移除壁纸",IDC_REMOVE_WALLPAPER,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,15,15,155,15
-    CONTROL         "Disable user interface effects",IDC_DISABLE_EFFECTS,
+    CONTROL         "禁用界面特效",IDC_DISABLE_EFFECTS,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,30,155,14
-    GROUPBOX        "When last client disconnects",IDC_STATIC,7,55,171,60
-    CONTROL         "Do nothing",IDC_DISCONNECT_NONE,"Button",
+    GROUPBOX        "最后一个客户端断开时",IDC_STATIC,7,55,171,60
+    CONTROL         "不执行操作",IDC_DISCONNECT_NONE,"Button",
                     BS_AUTORADIOBUTTON,15,65,155,15
-    CONTROL         "Lock workstation",IDC_DISCONNECT_LOCK,"Button",
+    CONTROL         "锁定工作站",IDC_DISCONNECT_LOCK,"Button",
                     BS_AUTORADIOBUTTON,15,80,155,15
-    CONTROL         "Logoff user",IDC_DISCONNECT_LOGOFF,"Button",
+    CONTROL         "注销用户",IDC_DISCONNECT_LOGOFF,"Button",
                     BS_AUTORADIOBUTTON,15,95,155,15
 END
 

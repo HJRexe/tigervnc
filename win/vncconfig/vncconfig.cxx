@@ -156,9 +156,9 @@ int WINAPI WinMain(HINSTANCE inst, HINSTANCE /*prev*/, char* /*cmdLine*/, int /*
       HICON icon = (HICON)LoadImage(inst, MAKEINTRESOURCE(IDI_ICON), IMAGE_ICON, 0, 0, LR_SHARED);
 
       // Create the PropertySheet handler
-      const char* propSheetTitle = "VNC server properties (service-mode)";
+      const char* propSheetTitle = "VNC 服务器属性（服务模式）";
       if (configKey == HKEY_CURRENT_USER)
-        propSheetTitle = "VNC server properties (user-mode)";
+        propSheetTitle = "VNC 服务器属性（用户模式）";
       PropSheet sheet(inst, propSheetTitle, pages, icon);
 
 #ifdef _DEBUG
