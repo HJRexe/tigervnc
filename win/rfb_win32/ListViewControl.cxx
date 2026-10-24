@@ -46,10 +46,11 @@ BOOL ListViewControl::InitLVColumns(DWORD idListView, HWND hDlg, int width, int 
     lvc.cx = width;
     lvc.fmt = format;
 
-    // UTF-8 narrow header -> wide string for ListView_InsertColumnW.
+    // UTF-8 narrow header -> wide string for the Unicode list-view message.
     MultiByteToWideChar(CP_UTF8, 0, title[iCol], -1, szText, 256);
     szText[255] = 0;
-    if (ListView_InsertColumnW(hList, iCol, &lvc) == -1)
+    if ((int)SendMessageW(hList, LVM_INSERTCOLUMNW,
+                          iCol, (LPARAM)&lvc) == -1)
       return FALSE;
   }
   return TRUE;
@@ -68,12 +69,13 @@ BOOL ListViewControl::InsertLVItem(DWORD idListView, HWND hDlg, int number,  cha
   lvI.iItem = number;
   lvI.iSubItem = 0;
 
-  // UTF-8 narrow row text -> wide string for ListView_InsertItemW.
+  // UTF-8 narrow row text -> wide string for the Unicode list-view message.
   MultiByteToWideChar(CP_UTF8, 0, texts[0], -1, wText, 256);
   wText[255] = 0;
   lvI.pszText = wText;
 
-  if(ListView_InsertItemW(hList, &lvI) == -1)
+  if ((int)SendMessageW(hList, LVM_INSERTITEMW,
+                        0, (LPARAM)&lvI) == -1)
     return FALSE;
 
   for (i =1; i < columns; i++) {
@@ -87,13 +89,18 @@ BOOL ListViewControl::InsertLVItem(DWORD idListView, HWND hDlg, int number,  cha
 void ListViewControl::SetLVItemText(DWORD idListView, HWND hDlg, int numberItem,
                                     int namberColumn, char * text)
 {
+  HWND hList = GetDlgItem(hDlg, idListView);
   WCHAR wText[256];
-  // UTF-8 narrow sub-item text -> wide string for ListView_SetItemTextW.
+  // UTF-8 narrow sub-item text -> wide string for the Unicode list-view message.
   MultiByteToWideChar(CP_UTF8, 0, text, -1, wText, 256);
   wText[255] = 0;
-  ListView_SetItemTextW(
-    GetDlgItem(hDlg, idListView),
-    numberItem, namberColumn, wText);
+  LVITEMW lvItem;
+  lvItem.mask = LVIF_TEXT;
+  lvItem.iItem = numberItem;
+  lvItem.iSubItem = namberColumn;
+  lvItem.pszText = wText;
+  SendMessageW(hList, LVM_SETITEMTEXTW,
+               numberItem, (LPARAM)&lvItem);
 }
 
 void ListViewControl::GetLVItemText(DWORD idListView, HWND hDlg, int numberItem,
