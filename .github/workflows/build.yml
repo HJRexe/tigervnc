@@ -39,7 +39,37 @@ jobs:
         working-directory: build
         continue-on-error: true
         run: ctest --test-dir tests/unit/ --output-junit test-results.xml
+      - name: Stage raw package
+        working-directory: build
+        shell: msys2 {0}
+        run: |
+          set -e
+          mkdir -p pkg/locale
+          cp vncviewer/vncviewer.exe pkg/vncviewer.exe
+          cp win/vncconfig/vncconfig.exe pkg/vncconfig.exe
+          cp win/winvnc/winvnc4.exe pkg/winvnc4.exe
+          cp win/wm_hooks/wm_hooks.dll pkg/wm_hooks.dll
+          cp ../README.rst pkg/README.rst
+          cp ../LICENCE.TXT pkg/LICENCE.TXT
+          for mo in po/*.mo; do
+            lang=$(basename "$mo" .mo)
+            mkdir -p "pkg/locale/$lang/LC_MESSAGES"
+            cp "$mo" "pkg/locale/$lang/LC_MESSAGES/tigervnc.mo"
+          done
+          missing=0
+          for f in pkg/vncviewer.exe pkg/vncconfig.exe pkg/winvnc4.exe pkg/wm_hooks.dll pkg/README.rst pkg/LICENCE.TXT; do
+            if [ ! -f "$f" ]; then
+              echo "MISSING: $f"
+              missing=1
+            fi
+          done
+          [ "$missing" -eq 0 ]
+          find pkg -type f | sort
       - uses: actions/upload-artifact@v4
         with:
           name: Windows
           path: build/release/tigervnc*.exe
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Package
+          path: build/pkg
