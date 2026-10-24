@@ -27,7 +27,6 @@
 #ifdef _WIN32
 #include <winsock2.h>
 #define errorNumber WSAGetLastError()
-#define close closesocket
 #include <core/winerrno.h>
 #else
 #include <sys/types.h>
@@ -54,7 +53,11 @@ FdInStream::FdInStream(int fd_, bool closeWhenDone_)
 
 FdInStream::~FdInStream()
 {
+#ifdef _WIN32
+  if (closeWhenDone) closesocket(fd);
+#else
   if (closeWhenDone) close(fd);
+#endif
 }
 
 
