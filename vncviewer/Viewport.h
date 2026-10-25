@@ -57,6 +57,21 @@ public:
 
   void draw(Surface* dst);
 
+  // Fit-to-window scaling helpers
+  void setFitMode(bool on);
+  void updateFitScale();
+  // Called by DesktopWindow when the remote framebuffer size changes
+  // while in fit mode (the widget size itself stays at the client area).
+  void remoteBufferResize(int new_w, int new_h);
+  // Map a remote framebuffer coordinate to local widget coordinates.
+  core::Point remoteToLocal(const core::Point& remote) const;
+  // Map a local widget coordinate to remote framebuffer coordinates.
+  // Returns false when the point lies outside the scaled image area.
+  bool localToRemote(int lx, int ly, core::Point& remote) const;
+
+  // Clip a remote damage rectangle to the framebuffer bounds.
+  core::Rect fitDamageRect(const core::Rect& r) const;
+
   // Clipboard events
   void handleClipboardRequest();
   void handleClipboardAnnounce(bool available);
@@ -133,6 +148,12 @@ private:
   Fl_RGB_Image *cursor;
   core::Point cursorHotspot;
   bool cursorIsBlank;
+
+  // Fit-to-window state
+  bool fitMode;
+  double fitScaleX, fitScaleY;
+  int dispW, dispH;
+  int offX, offY;
 };
 
 #endif

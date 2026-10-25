@@ -363,6 +363,14 @@ void DesktopWindow::resizeFramebuffer(int new_w, int new_h)
 {
   bool maximized;
 
+  // In fit mode the widget follows the client area, not the remote size.
+  // Only the backing framebuffer needs to be rebuilt for a new remote size.
+  if (fitToWindow) {
+    viewport->remoteBufferResize(new_w, new_h);
+    repositionWidgets();
+    return;
+  }
+
   if ((new_w == viewport->w()) && (new_h == viewport->h()))
     return;
 
@@ -440,19 +448,22 @@ void DesktopWindow::setCursorPos(const core::Point& pos)
     // Do nothing if we do not have the mouse captured.
     return;
   }
+
+  core::Point local = viewport->remoteToLocal(pos);
+
 #if defined(WIN32)
-  SetCursorPos(pos.x + x_root() + viewport->x(),
-               pos.y + y_root() + viewport->y());
+  SetCursorPos(local.x + x_root() + viewport->x(),
+               local.y + y_root() + viewport->y());
 #elif defined(__APPLE__)
   CGPoint new_pos;
-  new_pos.x = pos.x + x_root() + viewport->x();
-  new_pos.y = pos.y + y_root() + viewport->y();
+  new_pos.x = local.x + x_root() + viewport->x();
+  new_pos.y = local.y + y_root() + viewport->y();
   CGWarpMouseCursorPosition(new_pos);
 #else // Assume this is Xlib
   Window rootwindow = DefaultRootWindow(fl_display);
   XWarpPointer(fl_display, rootwindow, rootwindow, 0, 0, 0, 0,
-               pos.x + x_root() + viewport->x(),
-               pos.y + y_root() + viewport->y());
+               local.x + x_root() + viewport->x(),
+               local.y + y_root() + viewport->y());
 #endif
 }
 
@@ -1378,6 +1389,11 @@ void DesktopWindow::remoteResize()
   if (viewOnly)
     return;
 
+  // Fit-to-window scaling is purely local; never ask the server to change
+  // its desktop size when the window moves.
+  if (fitToWindow)
+    return;
+
   if (!::remoteResize)
     return;
   if (!cc->server.supportsSetDesktopSize)
@@ -1539,6 +1555,15 @@ void DesktopWindow::repositionWidgets()
 {
   int new_x, new_y;
 
+  // In fit mode the viewport covers the whole client area and the image
+  // is centered inside it; scrollbars are not used.
+  if (fitToWindow) {
+    hscroll->hide();
+    vscroll->hide();
+    viewport->resize(0, 0, w(), h());
+    return;
+  }
+
   // Viewport position
 
   new_x = viewport->x();
@@ -1637,6 +1662,10 @@ void DesktopWindow::handleOptions(void *data)
     self->fullscreen_on();
   else if (!fullScreen && self->fullscreen_active())
     self->fullscreen_off();
+
+  // Re-evaluate fit-to-window layout after the option changed.
+  self->viewport->setFitMode(fitToWindow);
+  self->repositionWidgets();
 }
 
 void DesktopWindow::handleFullscreenTimeout(void *data)

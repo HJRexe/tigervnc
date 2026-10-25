@@ -175,6 +175,21 @@ void Surface::draw(Surface* dst, int src_x, int src_y,
   CGContextRelease(bitmap);
 }
 
+// Scaled blit is not implemented on macOS; fall back to a 1:1 blit so that
+// non-Windows builds still link and render.
+void Surface::drawScaled(int src_x, int src_y, int /*src_w*/, int /*src_h*/,
+                          int dst_x, int dst_y, int dst_w, int dst_h)
+{
+  draw(src_x, src_y, dst_x, dst_y, dst_w, dst_h);
+}
+
+void Surface::drawScaled(Surface* dst, int src_x, int src_y,
+                         int /*src_w*/, int /*src_h*/,
+                         int dst_x, int dst_y, int dst_w, int dst_h)
+{
+  draw(dst, src_x, src_y, dst_x, dst_y, dst_w, dst_h);
+}
+
 void Surface::blend(int src_x, int src_y, int dst_x, int dst_y,
                     int dst_w, int dst_h, int a)
 {

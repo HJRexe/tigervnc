@@ -46,6 +46,13 @@ public:
   void draw(Surface* dst, int src_x, int src_y, int dst_x, int dst_y,
             int dst_w, int dst_h);
 
+  // Scaled blit: independent source and destination rectangles.
+  // Falls back to a 1:1 blit on platforms without a scaled implementation.
+  void drawScaled(int src_x, int src_y, int src_w, int src_h,
+                  int dst_x, int dst_y, int dst_w, int dst_h);
+  void drawScaled(Surface* dst, int src_x, int src_y, int src_w, int src_h,
+                  int dst_x, int dst_y, int dst_w, int dst_h);
+
   void blend(int src_x, int src_y, int dst_x, int dst_y,
              int dst_w, int dst_h, int a=255);
   void blend(Surface* dst, int src_x, int src_y, int dst_x, int dst_y,

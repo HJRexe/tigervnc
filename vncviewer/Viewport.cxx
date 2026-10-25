@@ -24,6 +24,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
+#include <algorithm>
 
 #include <stdexcept>
 
@@ -99,7 +100,9 @@ Viewport::Viewport(int w, int h, CConn* cc_)
     keyboard(nullptr), shortcutBypass(false), shortcutActive(false),
     firstLEDState(true), pendingClientClipboard(false),
     menuCtrlKey(false), menuAltKey(false), cursor(nullptr),
-    cursorIsBlank(false)
+    cursorIsBlank(false),
+    fitMode(fitToWindow), fitScaleX(1.0), fitScaleY(1.0),
+    dispW(w), dispH(h), offX(0), offY(0)
 {
 #if defined(WIN32)
   keyboard = new KeyboardWin32(this);
@@ -145,6 +148,8 @@ Viewport::Viewport(int w, int h, CConn* cc_)
 
   // Make sure we have an initial blank cursor set
   setCursor();
+
+  updateFitScale();
 }
 
 
@@ -188,7 +193,153 @@ void Viewport::updateWindow()
   core::Rect r;
 
   r = frameBuffer->getDamage();
-  damage(FL_DAMAGE_USER1, r.tl.x + x(), r.tl.y + y(), r.width(), r.height());
+
+  if (fitMode) {
+    core::Rect d = fitDamageRect(r);
+    damage(FL_DAMAGE_USER1, d.tl.x + x(), d.tl.y + y(),
+           d.width(), d.height());
+  } else {
+    damage(FL_DAMAGE_USER1, r.tl.x + x(), r.tl.y + y(),
+           r.width(), r.height());
+  }
+}
+
+
+void Viewport::setFitMode(bool on)
+{
+  if (fitMode == on)
+    return;
+
+  fitMode = on;
+  updateFitScale();
+  damage(FL_DAMAGE_ALL);
+}
+
+
+void Viewport::updateFitScale()
+{
+  if (!frameBuffer) {
+    fitScaleX = fitScaleY = 1.0;
+    dispW = w();
+    dispH = h();
+    offX = offY = 0;
+    return;
+  }
+
+  int fbW = frameBuffer->width();
+  int fbH = frameBuffer->height();
+
+  if (!fitMode || fbW <= 0 || fbH <= 0) {
+    fitScaleX = fitScaleY = 1.0;
+    dispW = fbW;
+    dispH = fbH;
+    offX = (w() > dispW) ? (w() - dispW) / 2 : 0;
+    offY = (h() > dispH) ? (h() - dispH) / 2 : 0;
+    return;
+  }
+
+  double s = std::min((double)w() / fbW, (double)h() / fbH);
+  if (s < 0.05)
+    s = 0.05;
+  if (s > 4.0)
+    s = 4.0;
+
+  fitScaleX = fitScaleY = s;
+  dispW = (int)(fbW * s + 0.5);
+  dispH = (int)(fbH * s + 0.5);
+  if (dispW > w())
+    dispW = w();
+  if (dispH > h())
+    dispH = h();
+  offX = (w() - dispW) / 2;
+  offY = (h() - dispH) / 2;
+}
+
+
+void Viewport::remoteBufferResize(int new_w, int new_h)
+{
+  if (!fitMode)
+    return;
+
+  if (frameBuffer &&
+      (frameBuffer->width() == new_w) && (frameBuffer->height() == new_h))
+    return;
+
+  // NOTE: the original code replaces frameBuffer without freeing the old
+  // instance; we keep that pattern here to match the existing behaviour.
+  frameBuffer = new PlatformPixelBuffer(new_w, new_h);
+  assert(frameBuffer);
+  cc->setFramebuffer(frameBuffer);
+
+  updateFitScale();
+  damage(FL_DAMAGE_ALL);
+}
+
+
+core::Point Viewport::remoteToLocal(const core::Point& remote) const
+{
+  core::Point local;
+
+  if (!fitMode) {
+    local.x = remote.x;
+    local.y = remote.y;
+    return local;
+  }
+
+  local.x = (int)(remote.x * fitScaleX + 0.5) + offX;
+  local.y = (int)(remote.y * fitScaleY + 0.5) + offY;
+  return local;
+}
+
+
+bool Viewport::localToRemote(int lx, int ly, core::Point& remote) const
+{
+  if (!fitMode) {
+    remote.x = lx;
+    remote.y = ly;
+    return true;
+  }
+
+  if ((lx < offX) || (lx >= offX + dispW) ||
+      (ly < offY) || (ly >= offY + dispH))
+    return false;
+
+  remote.x = (int)((lx - offX) / fitScaleX + 0.5);
+  remote.y = (int)((ly - offY) / fitScaleY + 0.5);
+
+  if (frameBuffer) {
+    if (remote.x < 0)
+      remote.x = 0;
+    if (remote.y < 0)
+      remote.y = 0;
+    if (remote.x >= frameBuffer->width())
+      remote.x = frameBuffer->width() - 1;
+    if (remote.y >= frameBuffer->height())
+      remote.y = frameBuffer->height() - 1;
+  }
+
+  return true;
+}
+
+
+core::Rect Viewport::fitDamageRect(const core::Rect& r) const
+{
+  core::Rect out;
+
+  if (!fitMode)
+    return r;
+
+  out.tl.x = (int)(r.tl.x * fitScaleX) + offX;
+  out.tl.y = (int)(r.tl.y * fitScaleY) + offY;
+  out.br.x = (int)(r.br.x * fitScaleX) + offX;
+  out.br.y = (int)(r.br.y * fitScaleY) + offY;
+
+  if (out.br.x <= out.tl.x)
+    out.br.x = out.tl.x + 1;
+  if (out.br.y <= out.tl.y)
+    out.br.y = out.tl.y + 1;
+
+  return out;
 }
 
 static const char * dotcursor_xpm[] = {
@@ -392,7 +543,36 @@ void Viewport::draw(Surface* dst)
   if ((W == 0) || (H == 0))
     return;
 
-  frameBuffer->draw(dst, X - x(), Y - y(), X, Y, W, H);
+  if (!fitMode) {
+    frameBuffer->draw(dst, X - x(), Y - y(), X, Y, W, H);
+    return;
+  }
+
+  // Clip the requested rectangle against the scaled, centered image area.
+  int cx0 = X - x(), cy0 = Y - y();
+  int ix0 = std::max(cx0, offX);
+  int iy0 = std::max(cy0, offY);
+  int ix1 = std::min(cx0 + W, offX + dispW);
+  int iy1 = std::min(cy0 + H, offY + dispH);
+  if ((ix1 <= ix0) || (iy1 <= iy0))
+    return;
+
+  int fbW = frameBuffer->width();
+  int fbH = frameBuffer->height();
+  int sx0 = (int)((ix0 - offX) / fitScaleX + 0.5);
+  int sy0 = (int)((iy0 - offY) / fitScaleY + 0.5);
+  int sx1 = (int)((ix1 - offX) / fitScaleX + 0.5);
+  int sy1 = (int)((iy1 - offY) / fitScaleY + 0.5);
+  if (sx0 < 0) sx0 = 0;
+  if (sy0 < 0) sy0 = 0;
+  if (sx1 > fbW) sx1 = fbW;
+  if (sy1 > fbH) sy1 = fbH;
+  if ((sx1 <= sx0) || (sy1 <= sy0))
+    return;
+
+  frameBuffer->drawScaled(dst, sx0, sy0, sx1 - sx0, sy1 - sy0,
+                           ix0 + x(), iy0 + y(),
+                           ix1 - ix0, iy1 - iy0);
 }
 
 
@@ -405,13 +585,42 @@ void Viewport::draw()
   if ((W == 0) || (H == 0))
     return;
 
-  frameBuffer->draw(X - x(), Y - y(), X, Y, W, H);
+  if (!fitMode) {
+    frameBuffer->draw(X - x(), Y - y(), X, Y, W, H);
+    return;
+  }
+
+  int cx0 = X - x(), cy0 = Y - y();
+  int ix0 = std::max(cx0, offX);
+  int iy0 = std::max(cy0, offY);
+  int ix1 = std::min(cx0 + W, offX + dispW);
+  int iy1 = std::min(cy0 + H, offY + dispH);
+  if ((ix1 <= ix0) || (iy1 <= iy0))
+    return;
+
+  int fbW = frameBuffer->width();
+  int fbH = frameBuffer->height();
+  int sx0 = (int)((ix0 - offX) / fitScaleX + 0.5);
+  int sy0 = (int)((iy0 - offY) / fitScaleY + 0.5);
+  int sx1 = (int)((ix1 - offX) / fitScaleX + 0.5);
+  int sy1 = (int)((iy1 - offY) / fitScaleY + 0.5);
+  if (sx0 < 0) sx0 = 0;
+  if (sy0 < 0) sy0 = 0;
+  if (sx1 > fbW) sx1 = fbW;
+  if (sy1 > fbH) sy1 = fbH;
+  if ((sx1 <= sx0) || (sy1 <= sy0))
+    return;
+
+  frameBuffer->drawScaled(sx0, sy0, sx1 - sx0, sy1 - sy0,
+                           ix0 + x(), iy0 + y(),
+                           ix1 - ix0, iy1 - iy0);
 }
 
 
 void Viewport::resize(int x, int y, int w, int h)
 {
-  if ((w != frameBuffer->width()) || (h != frameBuffer->height())) {
+  if (!fitMode &&
+      ((w != frameBuffer->width()) || (h != frameBuffer->height()))) {
     vlog.debug("Resizing framebuffer from %dx%d to %dx%d",
                frameBuffer->width(), frameBuffer->height(), w, h);
 
@@ -421,6 +630,7 @@ void Viewport::resize(int x, int y, int w, int h)
   }
 
   Fl_Widget::resize(x, y, w, h);
+  updateFitScale();
 }
 
 
@@ -652,7 +862,15 @@ void Viewport::flushPendingClipboard()
 void Viewport::handlePointerEvent(const core::Point& pos,
                                   uint16_t buttonMask)
 {
-  filterPointerEvent(pos, buttonMask);
+  core::Point remote;
+
+  if (!localToRemote(pos.x, pos.y, remote)) {
+    // Outside the scaled image area: keep the last reported position
+    // and do not push a spurious event to the server.
+    return;
+  }
+
+  filterPointerEvent(remote, buttonMask);
 }
 
 
@@ -923,7 +1141,8 @@ void Viewport::initContextMenu()
                 0, nullptr, (void*)ID_MINIMIZE, 0);
   fltk_menu_add(contextMenu, p_("ContextMenu|", "Resize &window to session"),
                 0, nullptr, (void*)ID_RESIZE,
-                (window()->fullscreen_active()?FL_MENU_INACTIVE:0) |
+                (window()->fullscreen_active() || fitToWindow
+                 ? FL_MENU_INACTIVE : 0) |
                 FL_MENU_DIVIDER);
 
   fltk_menu_add(contextMenu, p_("ContextMenu|", "&Ctrl"),
@@ -999,7 +1218,7 @@ void Viewport::popupContextMenu()
     window()->iconize();
     break;
   case ID_RESIZE:
-    if (window()->fullscreen_active())
+    if (window()->fullscreen_active() || fitToWindow)
       break;
     window()->size(w(), h());
     break;

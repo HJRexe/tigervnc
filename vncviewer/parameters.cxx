@@ -185,6 +185,12 @@ core::BoolParameter
                true);
 
 core::BoolParameter
+  fitToWindow("FitToWindow",
+              "Scale the remote desktop to fit the local window while "
+              "preserving the aspect ratio, centered with black borders",
+              false);
+
+core::BoolParameter
   viewOnly("ViewOnly",
            "Don't send any mouse or keyboard events to the server",
            false);
@@ -271,6 +277,7 @@ static core::VoidParameter* parameterArray[] = {
   &fullScreen,
   &fullScreenMode,
   &fullScreenSelectedMonitors,
+  &fitToWindow,
   /* Input */
   &viewOnly,
   &emulateMiddleButton,
