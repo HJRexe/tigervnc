@@ -906,6 +906,62 @@ msgstr "是"
 msgid "Close"
 msgstr "关闭"
 
+#: vncviewer/vncviewer.cxx:402
+msgid "Show:"
+msgstr "显示:"
+
+#: vncviewer/vncviewer.cxx:403
+msgid "Filename:"
+msgstr "文件名:"
+
+#: vncviewer/vncviewer.cxx:404
+msgid "Favorites"
+msgstr "收藏夹"
+
+#: vncviewer/vncviewer.cxx:405
+msgid "Add to Favorites"
+msgstr "添加到收藏夹"
+
+#: vncviewer/vncviewer.cxx:406
+msgid "Manage Favorites"
+msgstr "管理收藏夹"
+
+#: vncviewer/vncviewer.cxx:407
+msgid "My Computer"
+msgstr "我的电脑"
+
+#: vncviewer/vncviewer.cxx:408
+msgid "All Files (*)"
+msgstr "所有文件(*)"
+
+#: vncviewer/vncviewer.cxx:409
+msgid "Custom Filter"
+msgstr "自定义过滤器"
+
+#: vncviewer/vncviewer.cxx:410
+msgid "Preview"
+msgstr "预览"
+
+#: vncviewer/vncviewer.cxx:411
+msgid "Show hidden files"
+msgstr "显示隐藏文件"
+
+#: vncviewer/vncviewer.cxx:412
+msgid "Save"
+msgstr "保存"
+
+#: vncviewer/vncviewer.cxx:413
+msgid "New Directory?"
+msgstr "新建目录？"
+
+#: vncviewer/vncviewer.cxx:414
+msgid "Create a new directory."
+msgstr "创建新目录。"
+
+#: vncviewer/vncviewer.cxx:415
+msgid "Please choose an existing file!"
+msgstr "请选择一个已存在的文件！"
+
 #: vncviewer/vncviewer.cxx:401
 msgid "About"
 msgstr "关于"

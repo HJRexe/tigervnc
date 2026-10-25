@@ -37,6 +37,8 @@
 
 #include <rfb/SConnection.h>
 
+#include <windows.h>
+
 using namespace core;
 using namespace rfb;
 using namespace win32;
@@ -111,8 +113,15 @@ void VNCServerWin32::processAddressChange() {
   std::list<std::string> addrs;
   if (rfbSock.isListening())
     addrs = TcpListener::getMyAddresses();
-  else
-    addrs.push_front("未在监听连接");
+  else {
+    // Wide literal lives in the UTF-16 rodata section; convert it to UTF-8 at
+    // runtime so the narrow literal pool (which previously truncated the
+    // final character of this message) is not involved.
+    char not_listening[128];
+    WideCharToMultiByte(CP_UTF8, 0, L"未在监听连接", -1,
+                        not_listening, sizeof(not_listening), nullptr, nullptr);
+    addrs.push_front(not_listening);
+  }
 
   // Build the new tip
   std::list<std::string>::iterator i, next_i;
