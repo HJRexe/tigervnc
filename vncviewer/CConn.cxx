@@ -84,7 +84,11 @@ CConn::CConn()
 {
   setShared(::shared);
 
-  supportsLocalCursor = true;
+  // Do not negotiate server-side cursor bitmaps. Some Wayland VNC servers
+  // (e.g. wayvnc) advertise an oversized/bogus cursor shape (512x512 here)
+  // that exceeds the viewer's maxCursorSize and terminates the connection with
+  // "Too big cursor". Keep the local cursor instead.
+  supportsLocalCursor = false;
   supportsCursorPosition = true;
   supportsDesktopResize = true;
   supportsLEDState = true;
